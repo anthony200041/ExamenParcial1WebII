@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum Estado {
+  Activo
+  Pendiente
+  Eliminado
+}
+
+// Define el modelo de la entidad Idioma
+model Idioma {
+  Id            Int       @id @default(autoincrement())
+  Descripcion   String
+  estado   Estado   @default(Activo)
+  Registros     Registro[]
+}
+ 
+// Define el modelo de la entidad Palabra
+model Palabra {
+  Id            Int       @id @default(autoincrement())
+  Palabra       String
+  Deletreo      String
+  estado   Estado   @default(Activo)
+  Registros     Registro[]
+}
+
+// Define el modelo de la entidad Registro
+model Registro {
+  Id            Int       @id @default(autoincrement())
+  Idioma        Idioma    @relation(fields: [IdiomaId], references: [Id])
+  IdiomaId      Int       // Campo para almacenar el ID del Idioma
+  Palabra       Palabra   @relation(fields: [PalabraId], references: [Id])
+  PalabraId     Int       // Campo para almacenar el ID de la Palabra
+  Deletreo      String
+  Silabas       String?
+  Fonetica      String?
+  estado   Estado   @default(Activo)
+}
+
+// Define el modelo de la entidad Auditoria
+model Auditoria {
+  Id            Int       @id @default(autoincrement())
+  Entidad       String
+  Detalle       String
+  Fecha         DateTime  @default(now())
+  IdAuditado    Int
+  estado        Estado    @default(Activo)
+}
